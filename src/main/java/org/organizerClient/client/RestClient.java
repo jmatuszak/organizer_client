@@ -1,10 +1,12 @@
 package org.organizerClient.client;
 
 
-import org.organizerClient.dataObjects.Tasks;
 import org.organizerClient.dataObjects.Todos;
+import org.organizerClient.gui.utilities.Constants;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.CommandLineRunner;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
@@ -17,9 +19,16 @@ public class RestClient {
     @Autowired
     RestTemplate restTemplate;
 
-    public List<Todos> getAllTodos(String url){
-        Todos[] todosArr = restTemplate.getForObject(url, Todos[].class);
+    public List<Todos> getAllTodos(){
+        Todos[] todosArr = restTemplate.getForObject(Constants.JSON_URL, Todos[].class);
         return Arrays.asList(todosArr);
     }
 
+    public void updateTodo(Todos todo) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<String> request = new HttpEntity<>(todo.toString(), headers);
+
+        restTemplate.postForObject(Constants.TODO_UPDATE_URL,request,String.class);
+    }
 }

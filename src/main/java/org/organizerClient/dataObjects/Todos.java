@@ -83,12 +83,16 @@ this.additionalProperties.put(name, value);
 
     @Override
     public String toString() {
-        return "Todos{" +
-                "id=" + id +
-                ", taskDate='" + taskDate + '\'' +
-                ", complete=" + complete +
-                ", task=" + task +
-                ", additionalProperties=" + additionalProperties +
-                '}';
+        return "{\n" +
+                "        \"id\": 1,\n" +
+                "        \"taskDate\": \"2021-04-29T17:10:06.765+00:00\",\n" +
+                "        \"complete\": true,\n" +
+                "        \"task\": {\n" +
+                "            \"id\": 2,\n" +
+                "            \"taskName\": \"wynieść śmieci\",\n" +
+                "            \"description\": \"To nie jest trudne\",\n" +
+                "            \"category\": \"Domowe obowiązki\"\n" +
+                "        }\n" +
+                "    }";
     }
 }

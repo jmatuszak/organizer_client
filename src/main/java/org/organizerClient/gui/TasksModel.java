@@ -5,27 +5,41 @@
  */
 package org.organizerClient.gui;
 
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
 
-/**
- *
- * @author Too
- */
-@Getter
-@Setter
-@NoArgsConstructor
-@ToString
 public class TasksModel {
     
     private String title;
     private Boolean completed;
 
+    public TasksModel() {
+    }
+
     public TasksModel(String title, boolean completed) {
         this.title = title;
         this.completed = completed;
     }
-    
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public Boolean getCompleted() {
+        return completed;
+    }
+
+    public void setCompleted(Boolean completed) {
+        this.completed = completed;
+    }
+
+    @Override
+    public String toString() {
+        return "TasksModel{" +
+                "title='" + title + '\'' +
+                ", completed=" + completed +
+                '}';
+    }
 }

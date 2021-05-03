@@ -20,13 +20,16 @@ import org.springframework.stereotype.Component;
 import java.net.URL;
 import java.util.ResourceBundle;
 
+import static org.organizerClient.gui.utilities.Constants.BTN_COMPLETE_TEXT;
+import static org.organizerClient.gui.utilities.Constants.BTN_INCOMPLETE_TEXT;
+
 /**
  * FXML Controller class
  *
  * @author Too
  */
 @Component
-public class TaskItemController {
+public class TaskItemController{
 
     @FXML
     private ImageView iconSelect;
@@ -38,23 +41,38 @@ public class TaskItemController {
     private Button btnInfo;
 
 
-
     public void setTask(TasksModel model) {
-        ContextMenu menu = new ContextMenu();
-        System.out.println(model.toString());
         lblTaskName.setText(model.getTitle());
+        Boolean isTaskCompleted = model.getCompleted();
+        switchButton(isTaskCompleted);
 
-        if (model.getCompleted()) {
-            btnInfo.setText("Complete");
-            iconSelect.setImage(new Image(getClass().getResourceAsStream(Constants.ICON_CHECK_FILL)));
-            menu.getItems().add(new MenuItem("Set Task InComplete"));
-        } else {
-            btnInfo.setText("InComplete");
-            iconSelect.setImage(new Image(getClass().getResourceAsStream(Constants.ICON_CHECK_UNFILL)));
-            menu.getItems().add(new MenuItem("Set Task Complete"));
-        }
-
-        lblTaskName.setContextMenu(menu);
     }
+
+    public void changeTaskState(TasksModel tasksModel) {
+        switchButton(tasksModel.getCompleted());
+    }
+
+    public void switchButton(boolean isTaskCompleted) {
+        if (isTaskCompleted) {
+            btnInfo.setText(BTN_COMPLETE_TEXT);
+            iconSelect.setImage(new Image(getClass().getResourceAsStream(Constants.ICON_CHECK_FILL)));
+        } else {
+            btnInfo.setText(BTN_INCOMPLETE_TEXT);
+            iconSelect.setImage(new Image(getClass().getResourceAsStream(Constants.ICON_CHECK_UNFILL)));
+        }
+    }
+
+    public ImageView getIconSelect() {
+        return iconSelect;
+    }
+
+    public Label getLblTaskName() {
+        return lblTaskName;
+    }
+
+    public Button getBtnInfo() {
+        return btnInfo;
+    }
+
 
 }
