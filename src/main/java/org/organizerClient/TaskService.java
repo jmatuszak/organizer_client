@@ -25,6 +25,9 @@ public class TaskService {
 
     public void updateTaskState(List<Todos> todosFromService, String taskName) {
         todosFromService.stream().filter(todo -> todo.getTask().getTaskName().equals(taskName))
-                .findFirst().ifPresent(todo -> restClient.updateTodo(todo));
+                .findFirst().ifPresent(todo -> {
+                    todo.setComplete(!todo.getComplete());
+                    restClient.updateTodo(todo);
+        });
     }
 }

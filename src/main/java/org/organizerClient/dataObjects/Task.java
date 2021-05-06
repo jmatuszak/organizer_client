@@ -81,5 +81,13 @@ public void setAdditionalProperty(String name, Object value) {
 this.additionalProperties.put(name, value);
 }
 
-
+    @Override
+    public String toString() {
+        return "{" +
+                "id:" + id +
+                ", taskName:'" + taskName + '\'' +
+                ", description:'" + description + '\'' +
+                ", category:'" + category + '\'' +
+                '}';
+    }
 }

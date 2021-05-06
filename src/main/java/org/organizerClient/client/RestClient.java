@@ -27,8 +27,8 @@ public class RestClient {
     public void updateTodo(Todos todo) {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        HttpEntity<String> request = new HttpEntity<>(todo.toString(), headers);
+        HttpEntity<String> request = new HttpEntity(todo, headers);
 
-        restTemplate.postForObject(Constants.TODO_UPDATE_URL,request,String.class);
+        restTemplate.postForObject(Constants.TODO_UPDATE_URL,request,Todos.class);
     }
 }
