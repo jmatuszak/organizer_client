@@ -1,6 +1,7 @@
 package org.organizerClient.client;
 
 
+import org.organizerClient.dataObjects.Task;
 import org.organizerClient.dataObjects.Todos;
 import org.organizerClient.gui.utilities.Constants;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,5 +31,9 @@ public class RestClient {
         HttpEntity<String> request = new HttpEntity(todo, headers);
 
         restTemplate.postForObject(Constants.TODO_UPDATE_URL,request,Todos.class);
+    }
+
+    public Task findTaskById(Integer taskId) {
+        return restTemplate.getForObject(String.format(Constants.TASK_BY_ID, taskId), Task.class);
     }
 }

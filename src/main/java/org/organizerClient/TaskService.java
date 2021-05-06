@@ -1,6 +1,7 @@
 package org.organizerClient;
 
 import org.organizerClient.client.RestClient;
+import org.organizerClient.dataObjects.Task;
 import org.organizerClient.dataObjects.Todos;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -29,5 +30,14 @@ public class TaskService {
                     todo.setComplete(!todo.getComplete());
                     restClient.updateTodo(todo);
         });
+    }
+
+    public void updateTodo(Todos todo){
+        restClient.updateTodo(todo);
+
+    }
+
+    public Optional<Task> findTaskById(Integer taskId) {
+        return Optional.of(restClient.findTaskById(taskId));
     }
 }

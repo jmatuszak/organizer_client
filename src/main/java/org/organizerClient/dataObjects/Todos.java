@@ -28,8 +28,7 @@ private String taskDate;
 private Boolean complete;
 @JsonProperty("task")
 private Task task;
-@JsonIgnore
-private Map<String, Object> additionalProperties = new HashMap<String, Object>();
+
 
 @JsonProperty("id")
 public Integer getId() {
@@ -69,16 +68,6 @@ return task;
 @JsonProperty("task")
 public void setTask(Task task) {
 this.task = task;
-}
-
-@JsonAnyGetter
-public Map<String, Object> getAdditionalProperties() {
-return this.additionalProperties;
-}
-
-@JsonAnySetter
-public void setAdditionalProperty(String name, Object value) {
-this.additionalProperties.put(name, value);
 }
 
     @Override

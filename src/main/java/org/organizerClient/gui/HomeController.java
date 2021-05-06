@@ -13,8 +13,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
+import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseButton;
@@ -33,6 +32,8 @@ import org.springframework.stereotype.Component;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.URL;
+import java.sql.Timestamp;
+import java.util.Calendar;
 import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
@@ -47,6 +48,15 @@ import static org.organizerClient.gui.utilities.Constants.*;
  */
 @Component
 public class HomeController implements Initializable {
+    public Button btnEX;
+    public TextArea taskDescriptionTa;
+    public Button saveBtn;
+    public Button newTaskBtn;
+    public Button deleteBtn;
+    public TextField taskNameTf;
+    private String lastEditedLbl;
+    private Integer taskId;
+
     private RestClient restClient;
     private TaskItemController taskItemController;
     private TaskService taskService;
@@ -135,6 +145,57 @@ public class HomeController implements Initializable {
             });
         });
 
+        Label taskNameLbl = taskItemController.getLblTaskName();
+        taskNameLbl.setOnMouseClicked(mouseEvent -> {
+            if (mouseEvent.getButton().equals(MouseButton.PRIMARY)){
+                if (mouseEvent.getClickCount()==2){
+                    Optional<Todos> optionalTodo = taskService.findTodoByName(taskNameLbl.getText());
+                    optionalTodo.ifPresent(todo -> {
+                        lastEditedLbl= taskNameLbl.getText();
+                        taskId = todo.getTask().getId();
+                        taskDescriptionTa.clear();
+                        String description = todo.getTask().getDescription();
+                        String[] multiRowDesc = description.split("\\\\n");
+                        StringBuilder stringBuilder = new StringBuilder();
+                        for (String position : multiRowDesc) {
+                            stringBuilder.append("\n"+position);
+                        }
+                        taskDescriptionTa.setText(stringBuilder.toString());
+                        taskNameTf.setText(lastEditedLbl);
+                    });
+                }
+            }
+        });
+
+
+        saveBtn.setOnAction(evt -> {
+            String description = taskDescriptionTa.getText();
+            String taskName = taskNameTf.getText();
+            if (taskId!= null){
+                Optional<Todos> optionalTodo = taskService.findTodoByName(lastEditedLbl);
+                optionalTodo.ifPresent(todo -> {
+                    taskService.findTaskById(taskId).ifPresent(task -> {
+                        task.setTaskName(taskName);
+                        task.setDescription(description);
+                        todo.setTask(task);
+                    });
+                    taskService.updateTodo(todo);
+                    taskId=null;
+                    lastEditedLbl=null;
+                });
+            }
+            else {
+                org.organizerClient.dataObjects.Task task = new org.organizerClient.dataObjects.Task();
+                task.setCategory("");
+                task.setTaskName(taskName);
+                task.setDescription(description);
+                Todos todos = new Todos();
+                todos.setComplete(false);
+                todos.setTask(task);
+                todos.setTaskDate(new Timestamp(Calendar.getInstance().getTimeInMillis()).toString());
+
+            }
+        });
     }
 
     private void updateOrganiserServiceObjects(String taskName) {

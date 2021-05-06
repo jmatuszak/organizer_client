@@ -1,20 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.Insets?>
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.control.ScrollPane?>
-<?import javafx.scene.control.TextField?>
-<?import javafx.scene.layout.AnchorPane?>
-<?import javafx.scene.layout.BorderPane?>
-<?import javafx.scene.layout.ColumnConstraints?>
-<?import javafx.scene.layout.GridPane?>
-<?import javafx.scene.layout.Pane?>
-<?import javafx.scene.layout.RowConstraints?>
-<?import javafx.scene.layout.VBox?>
-<?import javafx.scene.text.Font?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
 
-<AnchorPane id="AnchorPane" prefHeight="594.0" prefWidth="1049.0" style="-fx-background-radius: 1em;" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.organizerClient.gui.HomeController">
+<AnchorPane id="AnchorPane" prefHeight="594.0" prefWidth="1049.0" style="-fx-background-radius: 1em;" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.organizerClient.gui.HomeController">
    <children>
       <BorderPane prefHeight="594.0" prefWidth="1049.0" style="-fx-background-color: #474C5F; -fx-background-radius: 1em;">
          <center>
@@ -82,38 +73,12 @@
          <left>
             <Pane prefHeight="509.0" prefWidth="497.0" BorderPane.alignment="CENTER">
                <children>
-                  <TextField fx:id="tfSearch" layoutX="91.0" layoutY="146.0" prefHeight="34.0" prefWidth="260.0" promptText="Search Task or Project" style="-fx-background-color: #989AAD; -fx-background-radius: 1em;" styleClass="text-input" stylesheets="@../styles/fullpackstyling.css">
-                     <padding>
-                        <Insets left="15.0" />
-                     </padding>
-                  </TextField>
-                  <GridPane alignment="CENTER" layoutX="90.0" layoutY="236.0" prefHeight="211.0" prefWidth="277.0">
-                    <columnConstraints>
-                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                      <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                      <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                    </columnConstraints>
-                    <rowConstraints>
-                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                    </rowConstraints>
-                     <children>
-                        <Button mnemonicParsing="false" prefHeight="60.0" prefWidth="75.0" styleClass="button3" stylesheets="@../styles/fullpackstyling.css" text="GH" />
-                        <Button mnemonicParsing="false" prefHeight="60.0" prefWidth="75.0" styleClass="button3" stylesheets="@../styles/fullpackstyling.css" text="CP" GridPane.columnIndex="1" />
-                        <Button mnemonicParsing="false" prefHeight="60.0" prefWidth="75.0" styleClass="button3" stylesheets="@../styles/fullpackstyling.css" text="EC" GridPane.columnIndex="2" />
-                        <Button mnemonicParsing="false" prefHeight="60.0" prefWidth="75.0" styleClass="button3" stylesheets="@../styles/fullpackstyling.css" text="TA" GridPane.rowIndex="1" />
-                        <Button mnemonicParsing="false" prefHeight="60.0" prefWidth="75.0" styleClass="button3" stylesheets="@../styles/fullpackstyling.css" text="LP" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-                        <Button mnemonicParsing="false" prefHeight="60.0" prefWidth="75.0" styleClass="button3" stylesheets="@../styles/fullpackstyling.css" text="10+" GridPane.columnIndex="2" GridPane.rowIndex="1" />
-                     </children>
-                  </GridPane>
-                  <Label fx:id="lblProjectCount" layoutX="90.0" layoutY="219.0" text="Projects (12)" textFill="#fbfcfc" />
-                  <Label fx:id="lblName" layoutX="91.0" layoutY="60.0" text="Hi KeepToo" textFill="#fbfcfc">
-                     <font>
-                        <Font size="25.0" />
-                     </font>
-                  </Label>
-                  <Label fx:id="lblGreeting" layoutX="90.0" layoutY="96.0" text="Welcome back to your workspace - some work to be done ;-)" textFill="#989aad" />
+                  <TextArea fx:id="taskDescriptionTa" layoutX="110.0" layoutY="140.0" prefHeight="397.0" prefWidth="352.0" />
                   <Button fx:id="btnEX" layoutX="14.0" layoutY="14.0" mnemonicParsing="false" onMouseClicked="#closeWindow" prefHeight="24.0" prefWidth="35.0" style="-fx-background-color: #989AAD; -fx-background-radius: 1em;" text="--" textFill="#cdcdcd" />
+                  <Button fx:id="newTaskBtn" layoutX="87.0" layoutY="14.0" mnemonicParsing="false" text="create new" />
+                  <Button fx:id="saveBtn" layoutX="110.0" layoutY="546.0" mnemonicParsing="false" text="Save" />
+                  <Button fx:id="deleteBtn" layoutX="411.0" layoutY="546.0" mnemonicParsing="false" text="Delete" />
+                  <TextField fx:id="taskNameTf" layoutX="110.0" layoutY="93.0" prefHeight="25.0" prefWidth="351.0" />
                </children>
             </Pane>
          </left>

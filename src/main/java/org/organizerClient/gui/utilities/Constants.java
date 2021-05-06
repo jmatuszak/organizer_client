@@ -14,6 +14,7 @@ public class Constants {
     public final static String ICON_CHECK_FILL = "/icons/icons8_checked_filled_24px_1.png";
     public final static String JSON_URL = "http://localhost:8080/todos";
     public final static String TODO_UPDATE_URL = "http://localhost:8080/updateTodoList";
+    public final static String TASK_BY_ID = "http://localhost:8080/tasks/%d";
     public final static String APP_TITLE = "JFX Task Manager";
     public final static String BTN_COMPLETE_TEXT = "Complete";
     public final static String BTN_INCOMPLETE_TEXT = "InComplete";
