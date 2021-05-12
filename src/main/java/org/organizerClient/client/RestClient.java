@@ -2,7 +2,7 @@ package org.organizerClient.client;
 
 
 import org.organizerClient.dataObjects.Task;
-import org.organizerClient.dataObjects.Todos;
+import org.organizerClient.dataObjects.TodoList;
 import org.organizerClient.gui.utilities.Constants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
@@ -20,16 +20,16 @@ public class RestClient {
     @Autowired
     RestTemplate restTemplate;
 
-    public List<Todos> getAllTodos(){
-        Todos[] todosArr = restTemplate.getForObject(Constants.JSON_URL, Todos[].class);
+    public List<TodoList> getAllTodos(){
+        TodoList[] todosArr = restTemplate.getForObject(Constants.JSON_URL, TodoList[].class);
         return Arrays.asList(todosArr);
     }
 
-    public void updateTodo(Todos todo) {
+    public void updateTodo(TodoList todo) {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         HttpEntity<String> request = new HttpEntity(todo, headers);
-        restTemplate.postForObject(Constants.TODO_UPDATE_URL,request,Todos.class);
+        restTemplate.postForObject(Constants.TODO_UPDATE_URL,request, TodoList.class);
     }
 
     public Task findTaskById(Integer taskId) {

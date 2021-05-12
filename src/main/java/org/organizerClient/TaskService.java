@@ -2,7 +2,7 @@ package org.organizerClient;
 
 import org.organizerClient.client.RestClient;
 import org.organizerClient.dataObjects.Task;
-import org.organizerClient.dataObjects.Todos;
+import org.organizerClient.dataObjects.TodoList;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -19,12 +19,12 @@ public class TaskService {
         this.restClient = restClient;
     }
 
-    public Optional<Todos> findTodoByTaskName(String todoName){
-        List<Todos> allTodos = restClient.getAllTodos();
+    public Optional<TodoList> findTodoByTaskName(String todoName){
+        List<TodoList> allTodos = restClient.getAllTodos();
         return allTodos.stream().filter(todo -> todo.getTasks().stream().anyMatch(task -> task.getTaskName().equals(todoName))).findAny();
     }
 
-    public void updateTaskState(List<Todos> todosFromService, String taskName) {
+    public void updateTaskState(List<TodoList> todosFromService, String taskName) {
         todosFromService.stream().filter(todo -> todo.getTasks().stream().anyMatch(task -> task.getTaskName().equals(taskName)))
                 .findFirst().ifPresent(todo -> {
                     todo.setComplete(!todo.getComplete());
@@ -32,7 +32,7 @@ public class TaskService {
         });
     }
 
-    public void updateTodo(Todos todo){
+    public void updateTodo(TodoList todo){
         restClient.updateTodo(todo);
 
     }
@@ -45,7 +45,7 @@ public class TaskService {
         restClient.saveTask(task);
     }
 
-    public List<Todos> findAllTodos() {
+    public List<TodoList> findAllTodos() {
         return restClient.getAllTodos();
     }
 }

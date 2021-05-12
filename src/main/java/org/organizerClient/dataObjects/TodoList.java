@@ -17,10 +17,10 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
         "id",
         "taskDate",
         "complete",
-        "task"
+        "tasks"
 })
 @Generated("jsonschema2pojo")
-public class Todos {
+public class TodoList {
 
     @JsonProperty("id")
     private Integer id;
@@ -28,7 +28,7 @@ public class Todos {
     private String taskDate;
     @JsonProperty("complete")
     private Boolean complete;
-    @JsonProperty("task")
+    @JsonProperty("tasks")
     private Set<Task> tasks;
 
 
@@ -62,13 +62,13 @@ public class Todos {
         this.complete = complete;
     }
 
-    @JsonProperty("task")
+    @JsonProperty("tasks")
     public Set<Task> getTasks() {
         return tasks;
     }
 
 
-    @JsonProperty("task")
+    @JsonProperty("tasks")
     public void setTasks(Set<Task> tasks) {
         this.tasks = tasks;
     }
