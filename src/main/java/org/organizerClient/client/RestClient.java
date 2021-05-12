@@ -29,11 +29,14 @@ public class RestClient {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         HttpEntity<String> request = new HttpEntity(todo, headers);
-
         restTemplate.postForObject(Constants.TODO_UPDATE_URL,request,Todos.class);
     }
 
     public Task findTaskById(Integer taskId) {
         return restTemplate.getForObject(String.format(Constants.TASK_BY_ID, taskId), Task.class);
+    }
+
+    public void saveTask(Task task) {
+
     }
 }

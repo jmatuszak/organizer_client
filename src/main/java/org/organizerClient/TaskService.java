@@ -19,13 +19,13 @@ public class TaskService {
         this.restClient = restClient;
     }
 
-    public Optional<Todos> findTodoByName(String todoName){
+    public Optional<Todos> findTodoByTaskName(String todoName){
         List<Todos> allTodos = restClient.getAllTodos();
-        return allTodos.stream().filter(todo -> todo.getTask().getTaskName().equals(todoName)).findAny();
+        return allTodos.stream().filter(todo -> todo.getTasks().stream().anyMatch(task -> task.getTaskName().equals(todoName))).findAny();
     }
 
     public void updateTaskState(List<Todos> todosFromService, String taskName) {
-        todosFromService.stream().filter(todo -> todo.getTask().getTaskName().equals(taskName))
+        todosFromService.stream().filter(todo -> todo.getTasks().stream().anyMatch(task -> task.getTaskName().equals(taskName)))
                 .findFirst().ifPresent(todo -> {
                     todo.setComplete(!todo.getComplete());
                     restClient.updateTodo(todo);
@@ -39,5 +39,13 @@ public class TaskService {
 
     public Optional<Task> findTaskById(Integer taskId) {
         return Optional.of(restClient.findTaskById(taskId));
+    }
+
+    public void saveTask(Task task) {
+        restClient.saveTask(task);
+    }
+
+    public List<Todos> findAllTodos() {
+        return restClient.getAllTodos();
     }
 }
