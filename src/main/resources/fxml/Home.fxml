@@ -37,7 +37,7 @@
                      <center>
                         <ScrollPane prefHeight="78.0" prefWidth="495.0" style="-fx-border-color: #FBFCFC;" BorderPane.alignment="CENTER">
                            <content>
-                              <VBox fx:id="vTaskItemsupcoming" alignment="TOP_CENTER" prefHeight="137.0" prefWidth="520.0" style="-fx-background-color: #FBFCFC;" />
+                              <VBox fx:id="vTaskItemsupcoming" alignment="TOP_CENTER" prefHeight="134.0" prefWidth="520.0" style="-fx-background-color: #FBFCFC;" />
                            </content>
                         </ScrollPane>
                      </center>
