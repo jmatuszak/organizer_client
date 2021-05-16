@@ -1,4 +1,4 @@
-package sample;
+package org.organizerClient.gui.loginForm;
 
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -8,21 +8,20 @@ import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.Pane;
-import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Circle;
 import javafx.stage.Stage;
-import javafx.stage.StageStyle;
+import net.rgielen.fxweaver.core.FxmlView;
+import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
 
+@Component
+@FxmlView("profile.fxml")
 public class Controller implements Initializable {
 
     @FXML
@@ -43,26 +42,14 @@ public class Controller implements Initializable {
     private void aa(ActionEvent event) {
         // Button was clicked, do something...
         System.out.println("jsdfh");
-      //  change(this);
+        //  change(this);
 
     }
 
 
-
-
-
-    
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-
-
-       
-
-        Image image = new Image(getClass().getResource("pic.jpg").toExternalForm());
-        pic.setFill(new ImagePattern(image));
-
-                login.setText("Login");
-
+        login.setText("Login");
     }
 
     @FXML
@@ -96,7 +83,7 @@ public class Controller implements Initializable {
     @FXML
     public void minclick(MouseEvent event) throws IOException {
 
-        ((Stage)((Circle)event.getSource()).getScene().getWindow()).setIconified(true);
+        ((Stage) ((Circle) event.getSource()).getScene().getWindow()).setIconified(true);
 
 
     }

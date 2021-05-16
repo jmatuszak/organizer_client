@@ -1,20 +1,13 @@
-package sample;
+package org.organizerClient.gui.loginForm;
 
 import javafx.application.Application;
 import javafx.event.EventHandler;
-import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.StackPane;
-import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
-
-import javax.swing.text.html.ImageView;
 
 
 public class Main extends Application {
@@ -24,7 +17,7 @@ public class Main extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception{
-        Parent root = FXMLLoader.load(getClass().getResource("profile.fxml"));
+        Parent root = FXMLLoader.load(getClass().getResource("/org/organizerClient/gui/loginForm/profile.fxml"));
 
         root.setOnMousePressed(new EventHandler<MouseEvent>() {
             @Override

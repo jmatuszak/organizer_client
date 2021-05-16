@@ -171,3 +171,6 @@
 {
     -fx-background-color: linear-gradient(to bottom left, #A868A0, #2D75E8);
 }
+.ImageView{
+    -moz-border-radius: 20px;
+}
