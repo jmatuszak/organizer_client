@@ -1,8 +1,8 @@
 package org.organizerClient;
 
 import org.organizerClient.client.RestClient;
-import org.organizerClient.dataObjects.Task;
-import org.organizerClient.dataObjects.TodoList;
+import org.organizerClient.domain.Task;
+import org.organizerClient.domain.TodoList;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 

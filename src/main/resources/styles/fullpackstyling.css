@@ -174,3 +174,6 @@
 .ImageView{
     -moz-border-radius: 20px;
 }
+.text-field {
+    -fx-background-color: rgba(0,0,0,0.4);
+}

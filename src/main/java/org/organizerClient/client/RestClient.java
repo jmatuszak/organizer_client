@@ -1,13 +1,14 @@
 package org.organizerClient.client;
 
 
-import org.organizerClient.dataObjects.Task;
-import org.organizerClient.dataObjects.TodoList;
+import org.organizerClient.domain.Task;
+import org.organizerClient.domain.TodoList;
 import org.organizerClient.gui.utilities.Constants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
@@ -38,5 +39,12 @@ public class RestClient {
 
     public void saveTask(Task task) {
 
+    }
+
+    public boolean authenticateUser(String userCredentials) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Authorization", userCredentials);
+        ResponseEntity<String> serverAuthResponse = restTemplate.getForEntity("http://localhost:8080/auth", String.class);
+        return serverAuthResponse.getStatusCode().is2xxSuccessful();
     }
 }

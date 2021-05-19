@@ -21,7 +21,7 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 import org.organizerClient.TaskService;
 import org.organizerClient.client.RestClient;
-import org.organizerClient.dataObjects.TodoList;
+import org.organizerClient.domain.TodoList;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -146,7 +146,7 @@ public class HomeController implements Initializable {
                     Optional<TodoList> optionalTodo = taskService.findTodoByTaskName(taskNameLbl.getText());
                     optionalTodo.ifPresent(todo -> {
                         lastEditedLbl= taskNameLbl.getText();
-                        org.organizerClient.dataObjects.Task foundedTask = todo.getTasks().stream().filter(task -> task.getTaskName().equals(taskNameLbl.getText())).findFirst().get();
+                        org.organizerClient.domain.Task foundedTask = todo.getTasks().stream().filter(task -> task.getTaskName().equals(taskNameLbl.getText())).findFirst().get();
                         taskId = foundedTask.getId();
                         taskDescriptionTa.clear();
                         String description = foundedTask.getDescription();
@@ -172,7 +172,7 @@ public class HomeController implements Initializable {
                     taskService.findTaskById(taskId).ifPresent(task -> {
                         task.setTaskName(taskName);
                         task.setDescription(description);
-                        Set<org.organizerClient.dataObjects.Task> tasks = todo.getTasks();
+                        Set<org.organizerClient.domain.Task> tasks = todo.getTasks();
                         tasks.add(task);
                         todo.setTasks(tasks);
                     });
@@ -182,7 +182,7 @@ public class HomeController implements Initializable {
                 });
             }
             else {
-                org.organizerClient.dataObjects.Task task = new org.organizerClient.dataObjects.Task();
+                org.organizerClient.domain.Task task = new org.organizerClient.domain.Task();
                 task.setCategory("");
                 task.setTaskName(taskName);
                 task.setDescription(description);
