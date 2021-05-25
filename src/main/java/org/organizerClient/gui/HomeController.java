@@ -19,6 +19,7 @@ import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
+import net.rgielen.fxweaver.core.FxmlView;
 import org.organizerClient.TaskService;
 import org.organizerClient.client.RestClient;
 import org.organizerClient.domain.TodoList;
@@ -39,6 +40,7 @@ import static org.organizerClient.gui.utilities.Constants.*;
  * @author Too
  */
 @Component
+@FxmlView("home.fxml")
 public class HomeController implements Initializable {
     public Button btnEX;
     public TextArea taskDescriptionTa;

@@ -8,7 +8,7 @@ package org.organizerClient.gui.utilities;
 
 public class Constants {
 
-    public final static String FXML_HOME = "/fxml/Home.fxml";
+    public final static String FXML_HOME = "/org/organizerClient/gui/loginForm/home.fxml";
     public final static String FXML_ITEM_TASK = "/fxml/TaskItem.fxml";
     public final static String ICON_CHECK_UNFILL = "/icons/icons8_checked_filled_24px.png";
     public final static String ICON_CHECK_FILL = "/icons/icons8_checked_filled_24px_1.png";

@@ -17,13 +17,17 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.shape.Circle;
 import javafx.stage.Stage;
+import net.rgielen.fxweaver.core.FxWeaver;
 import net.rgielen.fxweaver.core.FxmlView;
 import org.organizerClient.client.RestClient;
 import org.organizerClient.dto.UserAuth;
+import org.organizerClient.gui.HomeController;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ResourceBundle;
 
@@ -57,6 +61,12 @@ public class LoginController implements Initializable {
     @Autowired
     private RestClient restClient;
 
+    @Autowired
+    private ApplicationContext applicationContext;
+
+    @Autowired
+    private UserAuth userAuth;
+
     private void aa(ActionEvent event) {
         // Button was clicked, do something...
         System.out.println("jsdfh");
@@ -77,13 +87,32 @@ public class LoginController implements Initializable {
                 e.printStackTrace();
             }
         });
+
+        login.setOnMouseClicked(evt -> performLogin());
     }
 
-    @FXML
     private void performLogin() {
-        UserAuth userData = new UserAuth(userNameTF.getText(), passwordTF.getText());
-        String userCredentials = userData.baseUserCredentials();
-        restClient.authenticateUser(userCredentials);
+//        UserAuth userData = new UserAuth(userNameTF.getText(), passwordTF.getText());
+        userAuth.setUserName("pawel1242");
+        userAuth.setPassword("qwertyuio");
+        String userCredentials = userAuth.baseUserCredentials();
+        try {
+            if (restClient.authenticateUser(userCredentials)) {
+                userAuth.setUserCredentials(userCredentials);
+                goToUserInterface();
+            }
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void goToUserInterface() {
+        FxWeaver fxWeaver = applicationContext.getBean(FxWeaver.class);
+        Parent root = fxWeaver.loadView(HomeController.class);
+        Scene scene = new Scene(root);
+        Stage stage = (Stage) rootPane.getScene().getWindow();
+        stage.setScene(scene);
+        stage.show();
     }
 
 

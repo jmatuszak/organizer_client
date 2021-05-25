@@ -22,6 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ResourceBundle;
 
@@ -68,12 +69,6 @@ public class RegistrationController implements Initializable {
         goToRegisterLbl.setOnMouseClicked(event1 -> System.out.println());
     }
 
-    @FXML
-    private void performLogin() {
-        UserAuth userData = new UserAuth(userNameTF.getText(), passwordTF.getText());
-        String userCredentials = userData.baseUserCredentials();
-        restClient.authenticateUser(userCredentials);
-    }
 
 
     public void back(MouseEvent event) throws IOException {
