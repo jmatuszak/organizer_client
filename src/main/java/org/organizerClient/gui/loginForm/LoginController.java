@@ -8,11 +8,13 @@ import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.shape.Circle;
 import javafx.stage.Stage;
 import net.rgielen.fxweaver.core.FxmlView;
@@ -26,8 +28,8 @@ import java.net.URL;
 import java.util.ResourceBundle;
 
 @Component
-@FxmlView("profile.fxml")
-public class Controller implements Initializable {
+@FxmlView("login.fxml")
+public class LoginController implements Initializable {
 
     @FXML
     public PasswordField passwordTF;
@@ -35,6 +37,10 @@ public class Controller implements Initializable {
     public TextField userNameTF;
     @FXML
     public Label loginLBL;
+    @FXML
+    public Label goToCreateAccount;
+    public Label goToRegisterLbl;
+    public AnchorPane rootPane;
     @FXML
     ImageView ic;
     @FXML
@@ -62,7 +68,15 @@ public class Controller implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         login.setText("Login");
-
+        goToRegisterLbl.setOnMouseClicked(event1 ->
+        {
+            try {
+                AnchorPane anchorPane = FXMLLoader.load(getClass().getResource("/fxml/register.fxml"));
+                rootPane.getChildren().setAll(anchorPane);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
     }
 
     @FXML

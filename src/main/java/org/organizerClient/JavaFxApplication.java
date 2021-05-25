@@ -5,7 +5,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import net.rgielen.fxweaver.core.FxWeaver;
-import org.organizerClient.gui.loginForm.Controller;
+import org.organizerClient.gui.loginForm.LoginController;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.context.ConfigurableApplicationContext;
 
@@ -25,7 +25,7 @@ public class JavaFxApplication extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception {
         FxWeaver fxWeaver = applicationContext.getBean(FxWeaver.class);
-        Parent root = fxWeaver.loadView(Controller.class);
+        Parent root = fxWeaver.loadView(LoginController.class);
         Scene scene = new Scene(root);
         primaryStage.setScene(scene);
         primaryStage.show();

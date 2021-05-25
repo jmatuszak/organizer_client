@@ -38,7 +38,7 @@ public class SecController implements Initializable {
     /**** change screen *****/
     @FXML
     public void hey(MouseEvent event) throws IOException {
-        Parent blah = FXMLLoader.load(getClass().getResource("profile.fxml"));
+        Parent blah = FXMLLoader.load(getClass().getResource("login.fxml"));
 
         Stage appStage = (Stage) ((Node) event.getSource()).getScene().getWindow();
         blah.setOnMousePressed(new EventHandler<MouseEvent>() {

@@ -17,7 +17,7 @@ public class Main extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception{
-        Parent root = FXMLLoader.load(getClass().getResource("/org/organizerClient/gui/loginForm/profile.fxml"));
+        Parent root = FXMLLoader.load(getClass().getResource("/org/organizerClient/gui/loginForm/login.fxml"));
 
         root.setOnMousePressed(new EventHandler<MouseEvent>() {
             @Override
