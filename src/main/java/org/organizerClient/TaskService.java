@@ -3,6 +3,7 @@ package org.organizerClient;
 import org.organizerClient.client.RestClient;
 import org.organizerClient.domain.Task;
 import org.organizerClient.domain.TodoList;
+import org.organizerClient.dto.UserRegistration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -19,13 +20,13 @@ public class TaskService {
         this.restClient = restClient;
     }
 
-    public Optional<TodoList> findTodoByTaskName(String todoName){
+    public Optional<TodoList> findTodoByTaskId(int taskId){
         List<TodoList> allTodos = restClient.getAllTodos();
-        return allTodos.stream().filter(todo -> todo.getTasks().stream().anyMatch(task -> task.getTaskName().equals(todoName))).findAny();
+        return allTodos.stream().filter(todo -> todo.getTasks().stream().anyMatch(task -> task.getId()==taskId)).findAny();
     }
 
-    public void updateTaskState(List<TodoList> todosFromService, String taskName) {
-        todosFromService.stream().filter(todo -> todo.getTasks().stream().anyMatch(task -> task.getTaskName().equals(taskName)))
+    public void updateTaskState(List<TodoList> todosFromService, int taskId) {
+        todosFromService.stream().filter(todo -> todo.getTasks().stream().anyMatch(task -> task.getId()==taskId))
                 .findFirst().ifPresent(todo -> {
                     todo.setComplete(!todo.getComplete());
                     restClient.updateTodo(todo);
@@ -47,5 +48,9 @@ public class TaskService {
 
     public List<TodoList> findAllTodos() {
         return restClient.getAllTodos();
+    }
+
+    public boolean registerUser(UserRegistration registeredUser) {
+        return restClient.registerUser(registeredUser);
     }
 }

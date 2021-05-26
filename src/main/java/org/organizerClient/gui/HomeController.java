@@ -121,22 +121,21 @@ public class HomeController implements Initializable {
     }
 
     private void initTaskItemControllerNodes() {
-        Button actionBtn = taskItemController.getBtnInfo();
-        actionBtn.setOnAction(evt -> {
+        Button taskCompleteBtn = taskItemController.getBtnInfo();
+        taskCompleteBtn.setOnAction(evt -> {
 
-            String taskName = ((Label) ((BorderPane) ((Button) evt.getSource()).getParent()).getCenter()).getText();
-            Optional<TodoList> optionalTodo = taskService.findTodoByTaskName(taskName);
+            String taskIdFromField = ((Label) ((BorderPane) ((Button) evt.getSource()).getParent()).getTop()).getText();
+            int taskId = Integer.parseInt(taskIdFromField);
+            Optional<TodoList> optionalTodo = taskService.findTodoByTaskId(taskId);
             optionalTodo.ifPresent(todo -> {
-                listOfTasks.stream().filter(tasksModel -> tasksModel.getTitle().equals(taskName))
+                listOfTasks.stream().filter(tasksModel -> tasksModel.getId()==taskId)
                         .findFirst()
                         .ifPresent(tasksModel -> tasksModel.setCompleted(getTaskState(tasksModel.getCompleted())));
-                BorderPane pane = (BorderPane) vTaskItems.getChildren().stream()
-                        .filter(children -> ((Label) ((BorderPane) children).getChildren().stream().filter(node -> node instanceof Label).findFirst().get()).getText().equals(taskName))
-                        .findFirst().get();
+                BorderPane pane = (BorderPane) vTaskItems.getChildren().stream().filter(node ->((Label)(((BorderPane)node).getTop())).getText().equals(taskIdFromField)).findAny().orElse(null);
                 Button button = (Button) pane.getChildren().stream().filter(node -> node instanceof Button).findFirst().get();
                 ImageView image = (ImageView) pane.getChildren().stream().filter(node -> node instanceof ImageView).findFirst().get();
                 changeNodeStates(button, image);
-                updateOrganiserServiceObjects(taskName);
+                updateOrganiserServiceObjects(taskId);
                 evt.consume();
             });
         });
@@ -145,7 +144,8 @@ public class HomeController implements Initializable {
         taskNameLbl.setOnMouseClicked(mouseEvent -> {
             if (mouseEvent.getButton().equals(MouseButton.PRIMARY)){
                 if (mouseEvent.getClickCount()==2){
-                    Optional<TodoList> optionalTodo = taskService.findTodoByTaskName(taskNameLbl.getText());
+                    Optional<TodoList> optionalTodo = taskService.findTodoByTaskId(4);
+//                    Optional<TodoList> optionalTodo = taskService.findTodoByTaskId(taskNameLbl.getText());
                     optionalTodo.ifPresent(todo -> {
                         lastEditedLbl= taskNameLbl.getText();
                         org.organizerClient.domain.Task foundedTask = todo.getTasks().stream().filter(task -> task.getTaskName().equals(taskNameLbl.getText())).findFirst().get();
@@ -169,7 +169,8 @@ public class HomeController implements Initializable {
             String description = taskDescriptionTa.getText();
             String taskName = taskNameTf.getText();
             if (taskId!= null){
-                Optional<TodoList> optionalTodo = taskService.findTodoByTaskName(lastEditedLbl);
+                Optional<TodoList> optionalTodo = taskService.findTodoByTaskId(4);
+//                Optional<TodoList> optionalTodo = taskService.findTodoByTaskId(lastEditedLbl);
                 optionalTodo.ifPresent(todo -> {
                     taskService.findTaskById(taskId).ifPresent(task -> {
                         task.setTaskName(taskName);
@@ -211,8 +212,8 @@ public class HomeController implements Initializable {
     }
 
 
-    private void updateOrganiserServiceObjects(String taskName) {
-        taskService.updateTaskState(todosFromService, taskName);
+    private void updateOrganiserServiceObjects(int taskId) {
+        taskService.updateTaskState(todosFromService, taskId);
     }
 
     private void changeNodeStates(Button button, ImageView image) {
@@ -240,7 +241,7 @@ public class HomeController implements Initializable {
             todosFromService = restClient.getAllTodos();
             List<TasksModel> tasksList = new ArrayList<>();
             todosFromService.forEach(todo ->
-                    todo.getTasks().forEach(task -> tasksList.add(new TasksModel(task.getTaskName(), todo.getComplete()))));
+                    todo.getTasks().forEach(task -> tasksList.add(new TasksModel(task.getId(),task.getTaskName(), todo.getComplete()))));
             return tasksList;
         }
 

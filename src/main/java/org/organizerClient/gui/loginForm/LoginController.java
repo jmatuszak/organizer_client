@@ -8,7 +8,6 @@ import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
@@ -80,12 +79,15 @@ public class LoginController implements Initializable {
         login.setText("Login");
         goToRegisterLbl.setOnMouseClicked(event1 ->
         {
-            try {
-                AnchorPane anchorPane = FXMLLoader.load(getClass().getResource("/fxml/register.fxml"));
-                rootPane.getChildren().setAll(anchorPane);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            FxWeaver fxWeaver = applicationContext.getBean(FxWeaver.class);
+            AnchorPane anchorPane = fxWeaver.loadView(RegistrationController.class);
+            rootPane.getChildren().setAll(anchorPane);
+//            try {
+//                AnchorPane anchorPane = FXMLLoader.load(getClass().getResource("/org/organizerClient/gui/loginForm/register.fxml"));
+//                rootPane.getChildren().setAll(anchorPane);
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            }
         });
 
         login.setOnMouseClicked(evt -> performLogin());

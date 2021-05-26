@@ -38,11 +38,15 @@ public class TaskItemController{
     private Label lblTaskName;
 
     @FXML
+    private Label lblTaskId;
+
+    @FXML
     private Button btnInfo;
 
 
     public void setTask(TasksModel model) {
         lblTaskName.setText(model.getTitle());
+        lblTaskId.setText(String.valueOf(model.getId()));
         Boolean isTaskCompleted = model.getCompleted();
         switchButton(isTaskCompleted);
 

@@ -1,10 +1,10 @@
 package org.organizerClient.client;
 
 
-import org.apache.tomcat.util.codec.binary.Base64;
 import org.organizerClient.domain.Task;
 import org.organizerClient.domain.TodoList;
 import org.organizerClient.dto.UserAuth;
+import org.organizerClient.dto.UserRegistration;
 import org.organizerClient.gui.utilities.Constants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
@@ -13,7 +13,6 @@ import org.springframework.web.client.RestTemplate;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.List;
 
@@ -60,4 +59,9 @@ public class RestClient {
     }
 
 
+    public boolean registerUser(UserRegistration registeredUser) {
+        HttpEntity<String> request = new HttpEntity(registeredUser);
+        ResponseEntity<UserRegistration> serverRegistrationResponse = restTemplate.exchange("http://localhost:8080/register", HttpMethod.POST, request, UserRegistration.class);
+        return serverRegistrationResponse.getStatusCode().is2xxSuccessful();
+    }
 }

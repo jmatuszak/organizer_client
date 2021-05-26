@@ -7,16 +7,15 @@ package org.organizerClient.gui;
 
 
 public class TasksModel {
-    
+
+    private final int id;
     private String title;
     private Boolean completed;
 
-    public TasksModel() {
-    }
-
-    public TasksModel(String title, boolean completed) {
+    public TasksModel(int id, String title, boolean completed) {
         this.title = title;
         this.completed = completed;
+        this.id=id;
     }
 
     public String getTitle() {
@@ -33,6 +32,10 @@ public class TasksModel {
 
     public void setCompleted(Boolean completed) {
         this.completed = completed;
+    }
+
+    public int getId() {
+        return id;
     }
 
     @Override
