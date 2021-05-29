@@ -20,17 +20,10 @@ public class TaskService {
         this.restClient = restClient;
     }
 
-    public Optional<TodoList> findTodoByTaskId(int taskId){
-        List<TodoList> allTodos = restClient.getAllTodos();
-        return allTodos.stream().filter(todo -> todo.getTasks().stream().anyMatch(task -> task.getId()==taskId)).findAny();
-    }
 
-    public void updateTaskState(List<TodoList> todosFromService, int taskId) {
-        todosFromService.stream().filter(todo -> todo.getTasks().stream().anyMatch(task -> task.getId()==taskId))
-                .findFirst().ifPresent(todo -> {
-                    todo.setComplete(!todo.getComplete());
-                    restClient.updateTodo(todo);
-        });
+    public void updateTaskState(TodoList todoFromService, int taskId) {
+        todoFromService.setComplete(!todoFromService.getComplete());
+        restClient.updateTodo(todoFromService);
     }
 
     public void updateTodo(TodoList todo){
@@ -46,8 +39,8 @@ public class TaskService {
         restClient.saveTask(task);
     }
 
-    public List<TodoList> findAllTodos() {
-        return restClient.getAllTodos();
+    public TodoList findTodoForUser() {
+        return restClient.getTodoForUser();
     }
 
     public boolean registerUser(UserRegistration registeredUser) {

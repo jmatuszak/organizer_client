@@ -8,6 +8,7 @@ package org.organizerClient.gui;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
+import javafx.concurrent.WorkerStateEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -33,6 +34,7 @@ import java.time.LocalDate;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.stream.Collectors;
 
 import static org.organizerClient.gui.utilities.Constants.*;
 
@@ -50,13 +52,14 @@ public class HomeController implements Initializable {
     public TextField taskNameTf;
 
     public DatePicker taskDatePicker;
+    public Button reloadBtn;
     private String lastEditedLbl;
     private Integer taskId;
 
     private RestClient restClient;
     private TaskItemController taskItemController;
     private TaskService taskService;
-    private List<TodoList> todosFromService;
+    private TodoList todoFromService;
 
     @Autowired
     public HomeController(RestClient restClient, TaskItemController controller, TaskService taskService) {
@@ -83,9 +86,16 @@ public class HomeController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
+        reloadBtn.setOnAction(evt -> {
+         updateList();
+        });
+        updateList();
+    }
+
+    private void updateList() {
         ExecutorService executorService = Executors.newCachedThreadPool();
         executorService.submit(fetchList);
-
+        fetchList.setOnRunning(evt -> System.out.println("running"));
         fetchList.setOnSucceeded((event) -> {
 
             listOfTasks = FXCollections.observableArrayList(fetchList.getValue());
@@ -126,40 +136,39 @@ public class HomeController implements Initializable {
 
             String taskIdFromField = ((Label) ((BorderPane) ((Button) evt.getSource()).getParent()).getTop()).getText();
             int taskId = Integer.parseInt(taskIdFromField);
-            Optional<TodoList> optionalTodo = taskService.findTodoByTaskId(taskId);
-            optionalTodo.ifPresent(todo -> {
-                listOfTasks.stream().filter(tasksModel -> tasksModel.getId()==taskId)
-                        .findFirst()
-                        .ifPresent(tasksModel -> tasksModel.setCompleted(getTaskState(tasksModel.getCompleted())));
-                BorderPane pane = (BorderPane) vTaskItems.getChildren().stream().filter(node ->((Label)(((BorderPane)node).getTop())).getText().equals(taskIdFromField)).findAny().orElse(null);
-                Button button = (Button) pane.getChildren().stream().filter(node -> node instanceof Button).findFirst().get();
-                ImageView image = (ImageView) pane.getChildren().stream().filter(node -> node instanceof ImageView).findFirst().get();
-                changeNodeStates(button, image);
-                updateOrganiserServiceObjects(taskId);
-                evt.consume();
-            });
+            TodoList todo = taskService.findTodoForUser();
+
+            listOfTasks.stream().filter(tasksModel -> tasksModel.getId() == taskId)
+                    .findFirst()
+                    .ifPresent(tasksModel -> tasksModel.setCompleted(getTaskState(tasksModel.getCompleted())));
+            BorderPane pane = (BorderPane) vTaskItems.getChildren().stream().filter(node -> ((Label) (((BorderPane) node).getTop())).getText().equals(taskIdFromField)).findAny().orElse(null);
+            Button button = (Button) pane.getChildren().stream().filter(node -> node instanceof Button).findFirst().get();
+            ImageView image = (ImageView) pane.getChildren().stream().filter(node -> node instanceof ImageView).findFirst().get();
+            changeNodeStates(button, image);
+            updateOrganiserServiceObjects(taskId);
+            evt.consume();
+
         });
 
         Label taskNameLbl = taskItemController.getLblTaskName();
         taskNameLbl.setOnMouseClicked(mouseEvent -> {
-            if (mouseEvent.getButton().equals(MouseButton.PRIMARY)){
-                if (mouseEvent.getClickCount()==2){
-                    Optional<TodoList> optionalTodo = taskService.findTodoByTaskId(4);
-//                    Optional<TodoList> optionalTodo = taskService.findTodoByTaskId(taskNameLbl.getText());
-                    optionalTodo.ifPresent(todo -> {
-                        lastEditedLbl= taskNameLbl.getText();
-                        org.organizerClient.domain.Task foundedTask = todo.getTasks().stream().filter(task -> task.getTaskName().equals(taskNameLbl.getText())).findFirst().get();
-                        taskId = foundedTask.getId();
-                        taskDescriptionTa.clear();
-                        String description = foundedTask.getDescription();
-                        String[] multiRowDesc = description.split("\\\\n");
-                        StringBuilder stringBuilder = new StringBuilder();
-                        for (String position : multiRowDesc) {
-                            stringBuilder.append("\n"+position);
-                        }
-                        taskDescriptionTa.setText(stringBuilder.toString());
-                        taskNameTf.setText(lastEditedLbl);
-                    });
+            if (mouseEvent.getButton().equals(MouseButton.PRIMARY)) {
+                if (mouseEvent.getClickCount() == 2) {
+                    TodoList todo = taskService.findTodoForUser();
+
+                    lastEditedLbl = taskNameLbl.getText();
+                    org.organizerClient.domain.Task foundedTask = todo.getTasks().stream().filter(task -> task.getTaskName().equals(taskNameLbl.getText())).findFirst().get();
+                    taskId = foundedTask.getId();
+                    taskDescriptionTa.clear();
+                    String description = foundedTask.getDescription();
+                    String[] multiRowDesc = description.split("\\\\n");
+                    StringBuilder stringBuilder = new StringBuilder();
+                    for (String position : multiRowDesc) {
+                        stringBuilder.append("\n" + position);
+                    }
+                    taskDescriptionTa.setText(stringBuilder.toString());
+                    taskNameTf.setText(lastEditedLbl);
+
                 }
             }
         });
@@ -168,28 +177,26 @@ public class HomeController implements Initializable {
         saveBtn.setOnAction(evt -> {
             String description = taskDescriptionTa.getText();
             String taskName = taskNameTf.getText();
-            if (taskId!= null){
-                Optional<TodoList> optionalTodo = taskService.findTodoByTaskId(4);
-//                Optional<TodoList> optionalTodo = taskService.findTodoByTaskId(lastEditedLbl);
-                optionalTodo.ifPresent(todo -> {
-                    taskService.findTaskById(taskId).ifPresent(task -> {
-                        task.setTaskName(taskName);
-                        task.setDescription(description);
-                        Set<org.organizerClient.domain.Task> tasks = todo.getTasks();
-                        tasks.add(task);
-                        todo.setTasks(tasks);
-                    });
-                    taskService.updateTodo(todo);
-                    taskId=null;
-                    lastEditedLbl=null;
+            if (taskId != null) {
+                TodoList todoList = taskService.findTodoForUser();
+
+                taskService.findTaskById(taskId).ifPresent(task -> {
+                    task.setTaskName(taskName);
+                    task.setDescription(description);
+                    Set<org.organizerClient.domain.Task> tasks = todoList.getTasks();
+                    tasks.add(task);
+                    todoList.setTasks(tasks);
+                    taskService.updateTodo(todoList);
+                    taskId = null;
+                    lastEditedLbl = null;
                 });
-            }
-            else {
+            } else {
                 org.organizerClient.domain.Task task = new org.organizerClient.domain.Task();
+                task.setId(0);
                 task.setCategory("");
                 task.setTaskName(taskName);
                 task.setDescription(description);
-                TodoList todo = findTodo();
+                TodoList todo = taskService.findTodoForUser();
                 todo.setComplete(false);
                 todo.setTasks(Collections.singleton(task));
                 taskService.updateTodo(todo);
@@ -197,23 +204,9 @@ public class HomeController implements Initializable {
         });
     }
 
-    private TodoList findTodo() {
-        LocalDate value = taskDatePicker.getValue();
-        String timestamp = Timestamp.valueOf(value.atStartOfDay()).toString();
-        Optional<TodoList> optionalTodo = taskService.findAllTodos().stream().filter(todo -> todo.getTaskDate().equals(timestamp)).findAny();
-        if (optionalTodo.isPresent()){
-            return optionalTodo.get();
-        }
-        else{
-            TodoList todo = new TodoList();
-            todo.setTaskDate(timestamp);
-            return todo;
-        }
-    }
-
 
     private void updateOrganiserServiceObjects(int taskId) {
-        taskService.updateTaskState(todosFromService, taskId);
+        taskService.updateTaskState(todoFromService, taskId);
     }
 
     private void changeNodeStates(Button button, ImageView image) {
@@ -234,14 +227,13 @@ public class HomeController implements Initializable {
         return !completed;
     }
 
-    private final Task<List<TasksModel>> fetchList = new Task() {
+    private Task<List<TasksModel>> fetchList = new Task() {
 
         @Override
-        protected List<TasksModel> call() {
-            todosFromService = restClient.getAllTodos();
+        public List<TasksModel> call() {
+            todoFromService = restClient.getTodoForUser();
             List<TasksModel> tasksList = new ArrayList<>();
-            todosFromService.forEach(todo ->
-                    todo.getTasks().forEach(task -> tasksList.add(new TasksModel(task.getId(),task.getTaskName(), todo.getComplete()))));
+            todoFromService.getTasks().forEach(task -> tasksList.add(new TasksModel(task.getId(), task.getTaskName(), todoFromService.getComplete()))); //TODO - complete for task, not for todo
             return tasksList;
         }
 

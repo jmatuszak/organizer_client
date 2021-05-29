@@ -13,8 +13,6 @@ import org.springframework.web.client.RestTemplate;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.Arrays;
-import java.util.List;
 
 @Component
 public class RestClient {
@@ -25,11 +23,11 @@ public class RestClient {
     @Autowired
     UserAuth userAuth;
 
-    public List<TodoList> getAllTodos(){
+    public TodoList getTodoForUser(){
         HttpHeaders headers = new HttpHeaders();
         headers.add("Authorization", userAuth.getUserCredentials());
-        ResponseEntity<TodoList[]> todolistResponseEntity = restTemplate.exchange(Constants.JSON_URL, HttpMethod.GET, new HttpEntity<>(headers), TodoList[].class);
-        return Arrays.asList(todolistResponseEntity.getBody());
+        ResponseEntity<TodoList> todolistResponseEntity = restTemplate.exchange(Constants.JSON_URL, HttpMethod.GET, new HttpEntity<>(headers), TodoList.class);
+        return todolistResponseEntity.getBody();
     }
 
     public void updateTodo(TodoList todo) {
