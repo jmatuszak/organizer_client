@@ -8,6 +8,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
@@ -29,6 +30,8 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ResourceBundle;
+
+import static org.organizerClient.gui.utilities.Dialogs.showDialog;
 
 @Component
 @FxmlView("login.fxml")
@@ -82,26 +85,22 @@ public class LoginController implements Initializable {
             FxWeaver fxWeaver = applicationContext.getBean(FxWeaver.class);
             AnchorPane anchorPane = fxWeaver.loadView(RegistrationController.class);
             rootPane.getChildren().setAll(anchorPane);
-//            try {
-//                AnchorPane anchorPane = FXMLLoader.load(getClass().getResource("/org/organizerClient/gui/loginForm/register.fxml"));
-//                rootPane.getChildren().setAll(anchorPane);
-//            } catch (IOException e) {
-//                e.printStackTrace();
-//            }
         });
 
         login.setOnMouseClicked(evt -> performLogin());
     }
 
     private void performLogin() {
-//        UserAuth userData = new UserAuth(userNameTF.getText(), passwordTF.getText());
-        userAuth.setUserName("pawel1242");
-        userAuth.setPassword("qwertyuio");
+        userAuth.setUserName("jacek");
+        userAuth.setPassword("jacek");
         String userCredentials = userAuth.baseUserCredentials();
         try {
             if (restClient.authenticateUser(userCredentials)) {
                 userAuth.setUserCredentials(userCredentials);
                 goToUserInterface();
+            }
+            else {
+                showDialog(Alert.AlertType.ERROR,"Błąd!","Podano złe dane logowania! Spróbuj ponownie");
             }
         } catch (URISyntaxException e) {
             e.printStackTrace();

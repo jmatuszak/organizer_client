@@ -174,7 +174,7 @@ public class HomeController implements Initializable {
         });
 
 
-        saveBtn.setOnAction(evt -> {
+        saveBtn.setOnMouseClicked(evt -> {
             String description = taskDescriptionTa.getText();
             String taskName = taskNameTf.getText();
             if (taskId != null) {

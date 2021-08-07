@@ -12,13 +12,17 @@ import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.shape.Circle;
 import javafx.stage.Stage;
+import lombok.extern.slf4j.Slf4j;
+import net.rgielen.fxweaver.core.FxWeaver;
 import net.rgielen.fxweaver.core.FxmlView;
 import org.organizerClient.TaskService;
 import org.organizerClient.dto.UserRegistration;
 import org.organizerClient.dto.UserRole;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -26,6 +30,9 @@ import java.net.URL;
 import java.util.Collections;
 import java.util.ResourceBundle;
 
+import static org.organizerClient.gui.utilities.Dialogs.showDialog;
+
+@Slf4j
 @Component
 @FxmlView("register.fxml")
 public class RegistrationController implements Initializable {
@@ -44,9 +51,13 @@ public class RegistrationController implements Initializable {
     public PasswordField passwordVerifyingTF;
     @FXML
     public Label registerBtn;
+    public Label goToLoginLbl;
+    public AnchorPane rootPane;
 
     private double xOffset = 0;
     private double yOffset = 0;
+    @Autowired
+    private ApplicationContext applicationContext;
 
     @Autowired
     private TaskService taskService;
@@ -57,31 +68,48 @@ public class RegistrationController implements Initializable {
     public void initialize(URL url, ResourceBundle resourceBundle) {
 
         registerBtn.setOnMouseClicked(event1 -> performRegistration());
+        goToLoginLbl.setOnMouseClicked(event1 ->
+        {
+            FxWeaver fxWeaver = applicationContext.getBean(FxWeaver.class);
+            AnchorPane anchorPane = fxWeaver.loadView(LoginController.class);
+            rootPane.getChildren().setAll(anchorPane);
+        });
     }
 
     private void performRegistration() {
-//        ValidatorFactory validatorFactory = Validation.buildDefaultValidatorFactory();
-
-        UserRegistration registeredUser = new UserRegistration(firstNameTF.getText(),
-                lastNameTF.getText(),
-                emailTF.getText(),
-                loginTF.getText(),
-                passwordTF.getText(),
-                Collections.singletonList(UserRole.USER.toString()));
-
-        if (taskService.registerUser(registeredUser)){
-            showDialog(Alert.AlertType.CONFIRMATION,"Gartulacje!","Użytkownik został poprawnie zarejestrowany");
-        }
-        else {
-            showDialog(Alert.AlertType.ERROR, "Coś poszło nie tak!", "Spróbuj zarejestrować się ponownie");
+        if (validateFields()){
+            UserRegistration registeredUser = new UserRegistration(
+                    firstNameTF.getText(),
+                    lastNameTF.getText(),
+                    emailTF.getText(),
+                    loginTF.getText(),
+                    passwordTF.getText(),
+                    Collections.singletonList(UserRole.USER.toString()));
+            if (taskService.registerUser(registeredUser)){
+                log.info("User registered successful");
+                showDialog(Alert.AlertType.CONFIRMATION,"Gartulacje!","Użytkownik został poprawnie zarejestrowany");
+            }
+            else {
+                log.warn("User not registered");
+                showDialog(Alert.AlertType.ERROR, "Coś poszło nie tak!", "Spróbuj zarejestrować się ponownie");
+            }
         }
     }
 
-    private void showDialog(Alert.AlertType alertType, String windowTitle, String message) {
-        Alert alert = new Alert(alertType);
-        alert.setTitle(windowTitle);
-        alert.setContentText(message);
-        alert.showAndWait();
+    private boolean validateFields() {
+        if (!(firstNameTF.getText().isEmpty()||
+                lastNameTF.getText().isEmpty()||
+                emailTF.getText().isEmpty()||
+                loginTF.getText().isEmpty()||
+                passwordTF.getText().isEmpty())){
+            if (!passwordTF.getText().equals(passwordVerifyingTF.getText())){
+                showDialog(Alert.AlertType.WARNING, "Uwaga!", "Podane hasła są od siebie różne.");
+                return false;
+            }
+            return true;
+        }
+        showDialog(Alert.AlertType.WARNING,"Puste pola!","Niektóre pola nie zostały uzupełnione.");
+        return false;
     }
 
 
