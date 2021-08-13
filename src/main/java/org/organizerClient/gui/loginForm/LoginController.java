@@ -20,17 +20,20 @@ import javafx.stage.Stage;
 import net.rgielen.fxweaver.core.FxWeaver;
 import net.rgielen.fxweaver.core.FxmlView;
 import org.organizerClient.client.RestClient;
+import org.organizerClient.domain.User;
 import org.organizerClient.dto.UserAuth;
 import org.organizerClient.gui.HomeController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.HttpClientErrorException;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ResourceBundle;
 
+import static org.organizerClient.gui.Commons.changeScreen;
 import static org.organizerClient.gui.utilities.Dialogs.showDialog;
 
 @Component
@@ -66,50 +69,36 @@ public class LoginController implements Initializable {
     @Autowired
     private ApplicationContext applicationContext;
 
-    @Autowired
-    private UserAuth userAuth;
+    private User loggedUser;
 
-    private void aa(ActionEvent event) {
-        // Button was clicked, do something...
-        System.out.println("jsdfh");
-        //  change(this);
-
+    public User getLoggedUser() {
+        return loggedUser;
     }
-
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         login.setText("Login");
-        goToRegisterLbl.setOnMouseClicked(event1 ->
-        {
-            FxWeaver fxWeaver = applicationContext.getBean(FxWeaver.class);
-            AnchorPane anchorPane = fxWeaver.loadView(RegistrationController.class);
-            rootPane.getChildren().setAll(anchorPane);
-        });
-
+        goToRegisterLbl.setOnMouseClicked(event -> changeScreen(applicationContext, rootPane, RegistrationController.class));
         login.setOnMouseClicked(evt -> performLogin());
     }
 
+
     private void performLogin() {
-        userAuth.setUserName("jacek");
-        userAuth.setPassword("jacek");
-        String userCredentials = userAuth.baseUserCredentials();
         try {
-            if (restClient.authenticateUser(userCredentials)) {
-                userAuth.setUserCredentials(userCredentials);
+            User loggedUser = restClient.login(userNameTF.getText(), passwordTF.getText());
+            if (loggedUser != null) {
+                this.loggedUser = loggedUser;
                 goToUserInterface();
             }
-            else {
-                showDialog(Alert.AlertType.ERROR,"Błąd!","Podano złe dane logowania! Spróbuj ponownie");
-            }
-        } catch (URISyntaxException e) {
-            e.printStackTrace();
+        } catch (HttpClientErrorException httpClientErrorException) {
+            showDialog(Alert.AlertType.ERROR, "Błąd!", "Podano złe dane logowania! Spróbuj ponownie");
+
         }
     }
 
     private void goToUserInterface() {
         FxWeaver fxWeaver = applicationContext.getBean(FxWeaver.class);
-        Parent root = fxWeaver.loadView(HomeController.class);
+        AnchorPane root = fxWeaver.loadView(HomeController.class);
         Scene scene = new Scene(root);
         Stage stage = (Stage) rootPane.getScene().getWindow();
         stage.setScene(scene);

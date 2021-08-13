@@ -7,40 +7,48 @@ package org.organizerClient.gui;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.concurrent.ScheduledService;
 import javafx.concurrent.Task;
-import javafx.concurrent.WorkerStateEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
+import javafx.util.Duration;
+import lombok.extern.slf4j.Slf4j;
+import net.rgielen.fxweaver.core.FxWeaver;
 import net.rgielen.fxweaver.core.FxmlView;
 import org.organizerClient.TaskService;
 import org.organizerClient.client.RestClient;
-import org.organizerClient.domain.TodoList;
+import org.organizerClient.client.UserNotAuthorizedException;
+import org.organizerClient.gui.loginForm.LoginController;
+import org.organizerClient.gui.utilities.Dialogs;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.HttpClientErrorException;
 
 
 import java.net.URL;
-import java.sql.Timestamp;
-import java.time.LocalDate;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.stream.Collectors;
 
 import static org.organizerClient.gui.utilities.Constants.*;
 
 /**
  * @author Too
  */
+@Slf4j
 @Component
 @FxmlView("home.fxml")
 public class HomeController implements Initializable {
@@ -53,19 +61,22 @@ public class HomeController implements Initializable {
 
     public DatePicker taskDatePicker;
     public Button reloadBtn;
+    public AnchorPane anchorPane;
     private String lastEditedLbl;
     private Integer taskId;
 
     private RestClient restClient;
     private TaskItemController taskItemController;
     private TaskService taskService;
-    private TodoList todoFromService;
-
+    private LoginController loginController;
+    private ApplicationContext applicationContext;
     @Autowired
-    public HomeController(RestClient restClient, TaskItemController controller, TaskService taskService) {
+    public HomeController(RestClient restClient, TaskItemController controller, TaskService taskService,ApplicationContext applicationContext, LoginController loginController) {
         this.restClient = restClient;
         this.taskItemController = controller;
         this.taskService = taskService;
+        this.applicationContext = applicationContext;
+        this.loginController = loginController;
     }
 
     @FXML
@@ -86,15 +97,57 @@ public class HomeController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        reloadBtn.setOnAction(evt -> {
-         updateList();
+        reloadBtn.setOnAction(evt -> updateList());
+        saveBtn.setOnMouseClicked(evt -> {
+            String description = taskDescriptionTa.getText();
+            String taskName = taskNameTf.getText();
+            try {
+//            if (taskId != null) {
+
+//                restClient.saveTask(loginController.getLoggedUser(), )
+                org.organizerClient.domain.Task task1 = new org.organizerClient.domain.Task();
+                task1.setTask(taskName);
+                task1.setDescription(description);
+                task1.setCompleted(false);
+
+
+                taskId = null;
+                lastEditedLbl = null;
+                restClient.saveTask(loginController.getLoggedUser(), task1);
+
+//            }
+//            else {
+//                org.organizerClient.domain.Task task = new org.organizerClient.domain.Task();
+//                task.setId(0);
+//                task.setCategory("");
+//                task.setTaskName(taskName);
+//                task.setDescription(description);
+//                TodoList todo = taskService.findTodoForUser().orElse(new TodoList());
+//                todo.setComplete(false);
+//                todo.setTasks(Collections.singleton(task));
+//                taskService.updateTodo(todo);
+//            }
+            }catch (HttpClientErrorException httpClientErrorException) {
+                FxWeaver fxWeaver = applicationContext.getBean(FxWeaver.class);
+                AnchorPane root = fxWeaver.loadView(LoginController.class);
+                Scene scene = new Scene(root);
+                Stage stage = (Stage) anchorPane.getScene().getWindow();
+                stage.setScene(scene);
+                stage.show();
+            }
+
         });
         updateList();
     }
 
     private void updateList() {
+
+        svc.setPeriod(Duration.seconds(1));
+        svc.start();
+
         ExecutorService executorService = Executors.newCachedThreadPool();
         executorService.submit(fetchList);
+
         fetchList.setOnRunning(evt -> System.out.println("running"));
         fetchList.setOnSucceeded((event) -> {
 
@@ -124,10 +177,10 @@ public class HomeController implements Initializable {
                     }
                 }
             } catch (Exception e) {
-                System.err.println("Error Creating Tasks...");
-                System.err.println(e.getMessage());
+                log.error("Error Creating Tasks... {}",e.getMessage());
             }
         });
+        executorService.shutdown();
     }
 
     private void initTaskItemControllerNodes() {
@@ -136,7 +189,7 @@ public class HomeController implements Initializable {
 
             String taskIdFromField = ((Label) ((BorderPane) ((Button) evt.getSource()).getParent()).getTop()).getText();
             int taskId = Integer.parseInt(taskIdFromField);
-            TodoList todo = taskService.findTodoForUser();
+ /*           TodoList todo = taskService.findTodoForUser();*/
 
             listOfTasks.stream().filter(tasksModel -> tasksModel.getId() == taskId)
                     .findFirst()
@@ -145,7 +198,7 @@ public class HomeController implements Initializable {
             Button button = (Button) pane.getChildren().stream().filter(node -> node instanceof Button).findFirst().get();
             ImageView image = (ImageView) pane.getChildren().stream().filter(node -> node instanceof ImageView).findFirst().get();
             changeNodeStates(button, image);
-            updateOrganiserServiceObjects(taskId);
+            taskService.updateTaskState(loginController.getLoggedUser(), taskId,button.getText());
             evt.consume();
 
         });
@@ -154,13 +207,16 @@ public class HomeController implements Initializable {
         taskNameLbl.setOnMouseClicked(mouseEvent -> {
             if (mouseEvent.getButton().equals(MouseButton.PRIMARY)) {
                 if (mouseEvent.getClickCount() == 2) {
-                    TodoList todo = taskService.findTodoForUser();
+                    String taskId = taskItemController.getLblTaskId().getText();
+//                    try {
+                    org.organizerClient.domain.Task task = taskService.findTaskById(loginController.getLoggedUser(), taskId);
+//                    } catch (UserNotAuthorizedException e) {
+//                        e.printStackTrace();
+//                    }
 
                     lastEditedLbl = taskNameLbl.getText();
-                    org.organizerClient.domain.Task foundedTask = todo.getTasks().stream().filter(task -> task.getTaskName().equals(taskNameLbl.getText())).findFirst().get();
-                    taskId = foundedTask.getId();
                     taskDescriptionTa.clear();
-                    String description = foundedTask.getDescription();
+                    String description = task.getDescription();
                     String[] multiRowDesc = description.split("\\\\n");
                     StringBuilder stringBuilder = new StringBuilder();
                     for (String position : multiRowDesc) {
@@ -174,40 +230,14 @@ public class HomeController implements Initializable {
         });
 
 
-        saveBtn.setOnMouseClicked(evt -> {
-            String description = taskDescriptionTa.getText();
-            String taskName = taskNameTf.getText();
-            if (taskId != null) {
-                TodoList todoList = taskService.findTodoForUser();
 
-                taskService.findTaskById(taskId).ifPresent(task -> {
-                    task.setTaskName(taskName);
-                    task.setDescription(description);
-                    Set<org.organizerClient.domain.Task> tasks = todoList.getTasks();
-                    tasks.add(task);
-                    todoList.setTasks(tasks);
-                    taskService.updateTodo(todoList);
-                    taskId = null;
-                    lastEditedLbl = null;
-                });
-            } else {
-                org.organizerClient.domain.Task task = new org.organizerClient.domain.Task();
-                task.setId(0);
-                task.setCategory("");
-                task.setTaskName(taskName);
-                task.setDescription(description);
-                TodoList todo = taskService.findTodoForUser();
-                todo.setComplete(false);
-                todo.setTasks(Collections.singleton(task));
-                taskService.updateTodo(todo);
-            }
-        });
+
     }
 
 
-    private void updateOrganiserServiceObjects(int taskId) {
-        taskService.updateTaskState(todoFromService, taskId);
-    }
+//    private void updateOrganiserServiceObjects(int taskId) {
+//        taskService.updateTaskState(todoFromService, taskId);
+//    }
 
     private void changeNodeStates(Button button, ImageView image) {
         String buttonText = button.getText();
@@ -227,13 +257,51 @@ public class HomeController implements Initializable {
         return !completed;
     }
 
+    ScheduledService<List<TasksModel>> svc = new ScheduledService<List<TasksModel>>(){
+
+        @Override
+        protected Task<List<TasksModel>> createTask() {
+            return new Task<List<TasksModel>>() {
+                @Override
+                protected List<TasksModel> call() throws Exception {
+                    List<org.organizerClient.domain.Task> allTasksForUser = null;
+                    try {
+                        allTasksForUser = restClient.getAllTasksForUser(loginController.getLoggedUser());
+                    } catch (HttpClientErrorException httpClientErrorException) {
+                        Dialogs.showDialog(Alert.AlertType.WARNING,"UWAGA!", "Użytkownik nie przeszedł autentykacji. Nastąpi przekierowanie do strony logowania.");
+                        FxWeaver fxWeaver = applicationContext.getBean(FxWeaver.class);
+                        AnchorPane root = fxWeaver.loadView(LoginController.class);
+                        Scene scene = new Scene(root);
+                        Stage stage = (Stage) root.getScene().getWindow();
+                        stage.setScene(scene);
+                        stage.show();
+                    }
+                    List<TasksModel> tasksList = new ArrayList<>();
+                    allTasksForUser.forEach(task -> tasksList.add(new TasksModel(task.getId(), task.getTask(), task.getCompleted()))); //TODO - complete for task, not for todo
+                    return tasksList;
+                }
+            };
+        }
+    };
+
     private Task<List<TasksModel>> fetchList = new Task() {
 
         @Override
         public List<TasksModel> call() {
-            todoFromService = restClient.getTodoForUser();
+            List<org.organizerClient.domain.Task> allTasksForUser = null;
+            try {
+                allTasksForUser = restClient.getAllTasksForUser(loginController.getLoggedUser());
+            } catch (HttpClientErrorException httpClientErrorException) {
+                Dialogs.showDialog(Alert.AlertType.WARNING,"UWAGA!", "Użytkownik nie przeszedł autentykacji. Nastąpi przekierowanie do strony logowania.");
+                FxWeaver fxWeaver = applicationContext.getBean(FxWeaver.class);
+                AnchorPane root = fxWeaver.loadView(LoginController.class);
+                Scene scene = new Scene(root);
+                Stage stage = (Stage) root.getScene().getWindow();
+                stage.setScene(scene);
+                stage.show();
+            }
             List<TasksModel> tasksList = new ArrayList<>();
-            todoFromService.getTasks().forEach(task -> tasksList.add(new TasksModel(task.getId(), task.getTaskName(), todoFromService.getComplete()))); //TODO - complete for task, not for todo
+            allTasksForUser.forEach(task -> tasksList.add(new TasksModel(task.getId(), task.getTask(), task.getCompleted()))); //TODO - complete for task, not for todo
             return tasksList;
         }
 

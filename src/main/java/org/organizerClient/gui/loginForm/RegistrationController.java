@@ -16,13 +16,14 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.shape.Circle;
 import javafx.stage.Stage;
 import lombok.extern.slf4j.Slf4j;
-import net.rgielen.fxweaver.core.FxWeaver;
 import net.rgielen.fxweaver.core.FxmlView;
 import org.organizerClient.TaskService;
-import org.organizerClient.dto.UserRegistration;
+import org.organizerClient.domain.User;
 import org.organizerClient.dto.UserRole;
+import org.organizerClient.gui.Commons;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -70,26 +71,22 @@ public class RegistrationController implements Initializable {
         registerBtn.setOnMouseClicked(event1 -> performRegistration());
         goToLoginLbl.setOnMouseClicked(event1 ->
         {
-            FxWeaver fxWeaver = applicationContext.getBean(FxWeaver.class);
-            AnchorPane anchorPane = fxWeaver.loadView(LoginController.class);
-            rootPane.getChildren().setAll(anchorPane);
+            Commons.changeScreen(applicationContext,rootPane,LoginController.class);
         });
     }
 
     private void performRegistration() {
         if (validateFields()){
-            UserRegistration registeredUser = new UserRegistration(
+            User registeredUser = new User(
                     firstNameTF.getText(),
-                    lastNameTF.getText(),
-                    emailTF.getText(),
-                    loginTF.getText(),
                     passwordTF.getText(),
-                    Collections.singletonList(UserRole.USER.toString()));
-            if (taskService.registerUser(registeredUser)){
+                    passwordTF.getText()
+            );
+            HttpStatus responseStatus = taskService.registerUser(registeredUser);
+            if (responseStatus.is2xxSuccessful()) {
                 log.info("User registered successful");
                 showDialog(Alert.AlertType.CONFIRMATION,"Gartulacje!","Użytkownik został poprawnie zarejestrowany");
-            }
-            else {
+            } else {
                 log.warn("User not registered");
                 showDialog(Alert.AlertType.ERROR, "Coś poszło nie tak!", "Spróbuj zarejestrować się ponownie");
             }

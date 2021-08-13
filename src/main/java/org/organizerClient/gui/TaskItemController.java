@@ -74,6 +74,10 @@ public class TaskItemController{
         return lblTaskName;
     }
 
+    public Label getLblTaskId() {
+        return lblTaskId;
+    }
+
     public Button getBtnInfo() {
         return btnInfo;
     }
