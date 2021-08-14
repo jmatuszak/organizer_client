@@ -9,6 +9,9 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
+import java.sql.Date;
+
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
         "id",
@@ -22,6 +25,6 @@ public class Task {
     private int id;
     private String task;
     private String description;
-    private String date;
+    private Date date;
     private Boolean completed;
 }

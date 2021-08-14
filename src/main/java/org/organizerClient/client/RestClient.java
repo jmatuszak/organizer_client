@@ -36,9 +36,9 @@ public class RestClient {
         ResponseEntity<String> responseEntity = restTemplate.exchange(url, HttpMethod.GET, new HttpEntity<>(headerWithUserData), String.class);
         HttpStatus statusCode = responseEntity.getStatusCode();
         if (statusCode.is2xxSuccessful()) {
-            User User = new User();
-            User.setHeaderWithCredentials(headerWithUserData);
-            return User;
+            User user = new User();
+            user.setHeaderWithCredentials(headerWithUserData);
+            return user;
         }
         return null;
     }
@@ -49,8 +49,8 @@ public class RestClient {
         return responseEntity.getStatusCode();
     }
 
-    public List<Task> getAllTasksForUser(User User) {
-        HttpHeaders headerWithCredentials = User.getHeaderWithCredentials();
+    public List<Task> getAllTasksForUser(User user) {
+        HttpHeaders headerWithCredentials = user.getHeaderWithCredentials();
         String url = String.format("%s/findAllTasksForUser", serverHost);
         ResponseEntity<Task[]> exchange = restTemplate.exchange(url, HttpMethod.GET, new HttpEntity<>(headerWithCredentials), Task[].class);
         return Arrays.stream(Objects.requireNonNull(exchange.getBody())).filter(Objects::nonNull).collect(Collectors.toList());
@@ -58,20 +58,20 @@ public class RestClient {
 
 
 
-    public ResponseEntity<Integer> saveTask(User User, Task Task) {
+    public ResponseEntity<Integer> saveTask(User User, Task task) {
         HttpHeaders headerWithCredentials = User.getHeaderWithCredentials();
         String url = String.format("%s/addTask", serverHost);
-        return restTemplate.exchange(url, HttpMethod.POST, new HttpEntity<>(Task, headerWithCredentials), Integer.class);
+        return restTemplate.exchange(url, HttpMethod.POST, new HttpEntity<>(task, headerWithCredentials), Integer.class);
     }
 
-    public Task findTaskById(User User, int id) {
-        HttpHeaders headerWithCredentials = User.getHeaderWithCredentials();
+    public Task findTaskById(User user, int id) {
+        HttpHeaders headerWithCredentials = user.getHeaderWithCredentials();
         String url = String.format("%s/getTask/%d", serverHost,id);
         return restTemplate.exchange(url, HttpMethod.GET, new HttpEntity<>(headerWithCredentials), Task.class).getBody();
     }
 
-    public ResponseEntity<Boolean> deleteTask(User User, int id) {
-        HttpHeaders headerWithCredentials = User.getHeaderWithCredentials();
+    public ResponseEntity<Boolean> deleteTask(User user, int id) {
+        HttpHeaders headerWithCredentials = user.getHeaderWithCredentials();
         String url = String.format("%s/deleteTask/%d", serverHost,id);
         return restTemplate.exchange(url, HttpMethod.DELETE, new HttpEntity<>(headerWithCredentials), Boolean.class);
     }
@@ -85,9 +85,16 @@ public class RestClient {
         return httpHeaders;
     }
 
-    public void updateTaskState(User user, int taskId, Boolean state) {
+    public void changeTaskState(User user, int taskId) {
         HttpHeaders headerWithCredentials = user.getHeaderWithCredentials();
-        String url = String.format("%s/changeTaskState/%s?state=%s", serverHost,taskId,state.toString());
+        String url = String.format("%s/changeTaskState/%s", serverHost,taskId);
         restTemplate.exchange(url, HttpMethod.PUT, new HttpEntity<>(headerWithCredentials), String.class);
+    }
+
+    public void updateTask(User user, Task task) {
+        HttpHeaders headerWithCredentials = user.getHeaderWithCredentials();
+        String url = String.format("%s/updateTask", serverHost);
+        restTemplate.exchange(url, HttpMethod.PUT, new HttpEntity<>(task,headerWithCredentials), String.class);
+
     }
 }

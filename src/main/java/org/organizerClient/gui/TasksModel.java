@@ -6,14 +6,16 @@
 package org.organizerClient.gui;
 
 
+import java.sql.Date;
+
 public class TasksModel {
 
     private final int id;
     private String title;
     private Boolean completed;
 
-    public TasksModel(int id, String title, boolean completed) {
-        this.title = title;
+    public TasksModel(int id, String title, Date date, boolean completed) {
+        this.title = String.format("%s [%s]",title, date.toString());
         this.completed = completed;
         this.id=id;
     }
